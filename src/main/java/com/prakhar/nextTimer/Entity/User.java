@@ -35,16 +35,21 @@ public class User implements UserDetails {
 
     private String password;
 
-    public User(String name, int age, String email, String password) {
+    private String role;
+
+
+    public User(String name, int age, String email, String password, String role) {
         this.id = null;
         this.name = name;
         this.age = age;
         this.email = email;
+        this.password=password;
+        this.role=role;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority("ROLE_User");
+        SimpleGrantedAuthority simpleGrantedAuthority = new SimpleGrantedAuthority(role);
         return Collections.singletonList(simpleGrantedAuthority);
     }
 
