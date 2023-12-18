@@ -36,3 +36,6 @@ build/
 node
 node_modules
 .parcel-cache
+
+### Application Properties ###
+application.properties
