@@ -19,23 +19,31 @@ import java.util.function.Function;
 public class JwtService {
 
     @Value("${jwt.secret}")
-    public static String SECRET;
+    public String SECRET;
 
-    public String generateToken(String userName) {
+    @Value("${jwt.expirationMs}")
+    private long expirationMs;
+
+    public String generateToken(Long id) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userName);
+        return createToken(claims, id);
     }
+
+
     private Key getSignKey() {
         byte[] keyBytes= Decoders.BASE64.decode(SECRET);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    private String createToken(Map<String, Object> claims, String userName){
+    private String createToken(Map<String, Object> claims, Long id) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + expirationMs);
+
         return Jwts.builder()
                 .setClaims(claims)
-                .setSubject(userName)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
+                .setSubject(String.valueOf(id))
+                .setIssuedAt(now)
+                .setExpiration(expiryDate)
                 .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
     }
     public String extractUsername(String token) {
@@ -65,8 +73,8 @@ public class JwtService {
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        final String id = extractUsername(token);
+        return (id.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
 

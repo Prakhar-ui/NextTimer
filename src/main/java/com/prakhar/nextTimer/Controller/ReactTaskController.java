@@ -1,5 +1,6 @@
-package com.prakhar.nextTimer.Contorller;
+package com.prakhar.nextTimer.Controller;
 
+import com.prakhar.nextTimer.DTO.TimerDTO;
 import com.prakhar.nextTimer.Entity.Task;
 import com.prakhar.nextTimer.Service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,12 @@ public class ReactTaskController {
         return tasks;
     }
 
+    @PostMapping("/api/postSeconds")
+    public void postSeconds(@RequestBody TimerDTO timerDTO) {
+        taskService.postSeconds(timerDTO);
+    }
+
+
     @GetMapping("/api/getTask/{id}")
     public ResponseEntity<Optional<Task>> getTask(@PathVariable Long id) {
         Optional<Task> task = taskService.getTaskById(id);
@@ -31,6 +38,7 @@ public class ReactTaskController {
 
     @DeleteMapping("/api/deleteTask/{id}")
     public ResponseEntity<String> deleteTaskById(@PathVariable Long id) {
+        System.out.println("id " + id);
         taskService.deleteTaskById(id);
         return ResponseEntity.ok("Task deleted successfully");
     }

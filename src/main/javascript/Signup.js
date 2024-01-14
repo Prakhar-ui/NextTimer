@@ -1,57 +1,106 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.css";
-import { Container, Form, Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { Container as BootstrapContainer, Form, Button } from "react-bootstrap";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import NavBar from "./NavBar";
 import axios from "axios";
+import styled from "styled-components";
 
-const Signup = () => {
+const BackgroundContainer = styled.div`
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  padding-left: 0;
+  z-index: -1;
+  background: linear-gradient(to bottom right, #ffd9fb, white);
+`;
+
+const StyledContainer = styled(BootstrapContainer)`
+  border: 1px solid black;
+  width: 700px;
+`;
+
+const Signup = ({}) => {
   const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [timerType, setTimerType] = useState("");
-  const [hours, setHours] = useState(0);
-  const [minutes, setMinutes] = useState(0);
-  const [seconds, setSeconds] = useState(0);
-  const [priority, setPriority] = useState("");
-  const [enabled, setEnabled] = useState("");
+  const [age, setAge] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  async function save(task) {
-    task.preventDefault();
+  const navigate = useNavigate();
 
-    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+  async function save(user) {
+    user.preventDefault();
 
-    const taskData = {
-      name,
-      description,
-      timerType: timerType,
-      seconds: totalSeconds,
-      priority: parseInt(priority),
-      enabled: Boolean(enabled),
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/;
+
+    if (parseInt(age) > 100 || parseInt(age) <= 0 || parseInt(age) == "") {
+      alert("Please enter a valid age.");
+      return;
+    }
+
+    // Name length validation
+    if (name.length > 50) {
+      alert("Name must be less than 50 characters.");
+      return;
+    }
+
+    // Email format validation
+    const emailRegex = /\S+@\S+\.\S+/;
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    if (password.length < 8) {
+      alert("Password must be at least 8 characters long.");
+      return;
+    }
+
+    // Password complexity validation
+    if (!passwordRegex.test(password)) {
+      alert(
+        "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
+      );
+      return;
+    }
+
+    const userData = {
+      name: name,
+      age: age,
+      email: email,
+      password: password,
     };
 
     try {
-      await axios.post("/api/newTask", taskData);
 
-      alert("Task created successfully");
+      // Make a request to your authentication endpoint
+      const response = await axios.post("/registeruser", userData);
 
-      setName("");
-      setDescription("");
-      setTimerType("");
-      setHours(0);
-      setMinutes(0);
-      setSeconds(0);
-      setPriority(0);
-      setEnabled(false);
+      if (response.data === "Username already present") {
+        throw new Error(
+          "User already registered! Please login or forget password"
+        );
+      } else {
+        alert("User registered successfully");
+        navigate("/login");
+
+        setName("");
+        setAge("");
+        setEmail("");
+        setPassword("");
+      }
     } catch (error) {
-      console.error("Error while saving task:", error);
+      alert("User already registered! Please login or forget password");
     }
   }
 
   return (
-    <div>
+    <BackgroundContainer>
       <NavBar />
-      <Container className="my-5 p-5" style={{ border: "1px solid black" }}>
-        <h4 className="text-center">Create Task</h4>
+      <StyledContainer className="my-5 p-5">
+        <h4 className="text-center">Register</h4>
         <Form className="col-md-6 offset-md-3" onSubmit={save}>
           <Form.Group className="mb-3">
             <Form.Label className="fw-bold">Name</Form.Label>
@@ -64,102 +113,46 @@ const Signup = () => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Description</Form.Label>
+            <Form.Label className="fw-bold">Age</Form.Label>
             <Form.Control
-              type="text"
-              name="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              type="number"
+              name="age"
+              value={age}
+              onChange={(e) => setAge(e.target.value)}
+              min="0"
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label className="fw-bold">Email</Form.Label>
+            <Form.Control
+              type="email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
             />
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Timer Type</Form.Label>
-            <Form.Select
-              name="timerType"
-              value={timerType}
-              onChange={(e) => setTimerType(e.target.value)}
-              required
-            >
-              <option value="">Select Timer Type</option>
-              <option value="One-Time">One-Time</option>
-              <option value="Daily">Daily</option>
-            </Form.Select>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Timer</Form.Label>
-
-            <div className="d-flex align-items-center">
-              <Form.Label className="fw-bold me-2">Hours</Form.Label>
-              <Form.Control
-                type="number"
-                name="hours"
-                value={hours}
-                onChange={(e) => setHours(parseInt(e.target.value, 10))}
-                min="0"
-                placeholder="Hours"
-                className="me-2"
-              />
-
-              <Form.Label className="fw-bold me-2">Minutes</Form.Label>
-              <Form.Control
-                type="number"
-                name="minutes"
-                value={minutes}
-                onChange={(e) => setMinutes(parseInt(e.target.value, 10))}
-                min="0"
-                max="59"
-                placeholder="Minutes"
-                className="me-2"
-              />
-
-              <Form.Label className="fw-bold me-2">Seconds</Form.Label>
-              <Form.Control
-                type="number"
-                name="seconds"
-                value={seconds}
-                onChange={(e) => setSeconds(parseInt(e.target.value, 10))}
-                min="0"
-                max="59"
-                placeholder="Seconds"
-              />
-            </div>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Priority</Form.Label>
+            <Form.Label className="fw-bold">Password</Form.Label>
             <Form.Control
-              type="text"
-              name="priority"
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
+              type="password"
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3 d-flex align-items-center">
-            <Form.Check
-              type="checkbox"
-              label="Enabled"
-              className="fw-bold"
-              name="enabled"
-              checked={enabled}
-              onChange={(e) =>
-                setEnabled(e.target.checked ? e.target.checked : false)
-              }
             />
           </Form.Group>
 
           <div className="text-center">
             <Button variant="primary" type="submit">
-              Submit
+              Register
             </Button>
           </div>
         </Form>
-      </Container>
-    </div>
+      </StyledContainer>
+    </BackgroundContainer>
   );
 };
 

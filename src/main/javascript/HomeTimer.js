@@ -1,5 +1,19 @@
 import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 import { Row, Col } from "react-bootstrap";
+
+const TimerWrapper = styled(Row)`
+  text-align: center;
+  margin: 0;
+  align-items: stretch;
+`;
+
+const TimerText = styled(Col)`
+  font-size: 24px;
+  font-weight: bold;
+  color: #3498db;
+  white-space: nowrap;
+`;
 
 const HomeTimer = ({ seconds }) => {
   const calculatedYears = Math.floor(seconds / (365 * 24 * 3600));
@@ -22,28 +36,52 @@ const HomeTimer = ({ seconds }) => {
 
   useEffect(() => {
     let timer;
-  
+
     if (isRunning) {
       timer = setInterval(() => {
-        if (years === 0 && months === 0 && days === 0 && hours === 0 && minutes === 0 && currentSeconds === 0) {
+        if (
+          years === 0 &&
+          months === 0 &&
+          days === 0 &&
+          hours === 0 &&
+          minutes === 0 &&
+          currentSeconds === 0
+        ) {
           clearInterval(timer);
           window.location.reload();
         } else {
-          if (months === 0 && days === 0 && hours === 0 && minutes === 0 && currentSeconds === 0) {
+          if (
+            months === 0 &&
+            days === 0 &&
+            hours === 0 &&
+            minutes === 0 &&
+            currentSeconds === 0
+          ) {
             setYears((prevYears) => prevYears - 1);
             setMonths(11);
             setDays(isLeapYear(years) ? 29 : 28); // Update days based on leap year
             setHours(23);
             setMinutes(59);
             setSeconds(59);
-          } else if (days === 0 && hours === 0 && minutes === 0 && currentSeconds === 0 && months > 0) {
+          } else if (
+            days === 0 &&
+            hours === 0 &&
+            minutes === 0 &&
+            currentSeconds === 0 &&
+            months > 0
+          ) {
             setMonths((prevMonths) => prevMonths - 1);
             const daysInMonth = new Date(years, months, 0).getDate();
             setDays(daysInMonth);
             setHours(23);
             setMinutes(59);
             setSeconds(59);
-          } else if (hours === 0 && minutes === 0 && currentSeconds === 0 && days > 0) {
+          } else if (
+            hours === 0 &&
+            minutes === 0 &&
+            currentSeconds === 0 &&
+            days > 0
+          ) {
             setDays((prevDays) => prevDays - 1);
             setHours(23);
             setMinutes(59);
@@ -61,17 +99,16 @@ const HomeTimer = ({ seconds }) => {
         }
       }, 1000);
     }
-  
-    return () => clearInterval(timer);
-  }, [currentSeconds, minutes, hours, days, months, years]);
 
-  
+    return () => clearInterval(timer);
+  }, [seconds, currentSeconds, minutes, hours, days, months, years]);
+
   const isLeapYear = (year) =>
     (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 
   return (
-    <Row className="text-center mx-0 d-flex align-items-stretch">
-      <Col style={{ fontSize: "24px", fontWeight: "bold", color: "#3498db" }}>
+    <TimerWrapper className="mx-0">
+      <TimerText>
         {hours === 0 && years === 0 && days === 0 && (
           <span>
             {minutes} {minutes === 1 ? " minute" : " minutes"} and{" "}
@@ -98,8 +135,8 @@ const HomeTimer = ({ seconds }) => {
             {years} {years === 1 ? "year" : "years"}
           </span>
         )}
-      </Col>
-    </Row>
+      </TimerText>
+    </TimerWrapper>
   );
 };
 

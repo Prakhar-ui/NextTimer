@@ -1,165 +1,121 @@
-import React, { useState } from "react";
-import "bootstrap/dist/css/bootstrap.css";
+import React, { useState, useEffect } from "react";
 import { Container, Form, Button } from "react-bootstrap";
+import styled from "styled-components";
+import { useNavigate } from "react-router-dom";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import NavBar from "./NavBar";
 import axios from "axios";
 
-const Signin = () => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [timerType, setTimerType] = useState("");
-  const [hours, setHours] = useState(0);
-  const [minutes, setMinutes] = useState(0);
-  const [seconds, setSeconds] = useState(0);
-  const [priority, setPriority] = useState("");
-  const [enabled, setEnabled] = useState("");
+const BackgroundDiv = styled.div`
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  padding-left: 0;
+  z-index: -1;
+  background: linear-gradient(to bottom right, #ffd9fb, white);
+`;
 
-  async function save(task) {
-    task.preventDefault();
+const StyledContainer = styled(Container)`
+  border: 1px solid black;
+  width: 700px;
+`;
 
-    const totalSeconds = hours * 3600 + minutes * 60 + seconds;
+const Signin = ({}) => {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
 
-    const taskData = {
-      name,
-      description,
-      timerType: timerType,
-      seconds: totalSeconds,
-      priority: parseInt(priority),
-      enabled: Boolean(enabled),
+  const navigate = useNavigate();
+
+  async function handleSignIn(event) {
+    event.preventDefault();
+
+    const userData = {
+      username,
+      password,
     };
 
     try {
-      await axios.post("/api/newTask", taskData);
+      const response = await axios.post("/generateToken", userData);
 
-      alert("Task created successfully");
+      const token = response.data;
 
-      setName("");
-      setDescription("");
-      setTimerType("");
-      setHours(0);
-      setMinutes(0);
-      setSeconds(0);
-      setPriority(0);
-      setEnabled(false);
+      // Store the token in sessionStorage
+      sessionStorage.setItem("authToken", token);
+
+      try {
+        const config = {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        };
+
+        console.log(config);
+
+        const apiUrl = `http://localhost:8080/getUserByUsername?username=${username}`;
+
+        const response = await axios.get(apiUrl, config);
+
+        const user = response.data;
+
+        console.log(user);
+
+        
+        // Store the globalId in sessionStorage
+        sessionStorage.setItem("globalId", user.id);
+
+        navigate("/");
+
+
+      } catch (error) {
+        console.error("Error while setting id", error);
+      }
+
+      setUsername("");
+      setPassword("");
+
+      // You may want to redirect the user or perform other actions upon successful authentication
     } catch (error) {
-      console.error("Error while saving task:", error);
+      // Handle authentication failure
+      console.error("Authentication failed:", error);
+      alert("Authentication failed");
     }
   }
 
   return (
-    <div>
+    <BackgroundDiv>
       <NavBar />
-      <Container className="my-5 p-5" style={{ border: "1px solid black" }}>
-        <h4 className="text-center">Create Task</h4>
-        <Form className="col-md-6 offset-md-3" onSubmit={save}>
+      <StyledContainer className="my-5 p-5">
+        <h4 className="text-center">Sign In</h4>
+        <Form className="col-md-6 offset-md-3" onSubmit={handleSignIn}>
           <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Name</Form.Label>
+            <Form.Label className="fw-bold">Username</Form.Label>
             <Form.Control
               type="text"
-              name="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              name="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Description</Form.Label>
+            <Form.Label className="fw-bold">Password</Form.Label>
             <Form.Control
-              type="text"
-              name="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              type="password"
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               required
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Timer Type</Form.Label>
-            <Form.Select
-              name="timerType"
-              value={timerType}
-              onChange={(e) => setTimerType(e.target.value)}
-              required
-            >
-              <option value="">Select Timer Type</option>
-              <option value="One-Time">One-Time</option>
-              <option value="Daily">Daily</option>
-            </Form.Select>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Timer</Form.Label>
-
-            <div className="d-flex align-items-center">
-              <Form.Label className="fw-bold me-2">Hours</Form.Label>
-              <Form.Control
-                type="number"
-                name="hours"
-                value={hours}
-                onChange={(e) => setHours(parseInt(e.target.value, 10))}
-                min="0"
-                placeholder="Hours"
-                className="me-2"
-              />
-
-              <Form.Label className="fw-bold me-2">Minutes</Form.Label>
-              <Form.Control
-                type="number"
-                name="minutes"
-                value={minutes}
-                onChange={(e) => setMinutes(parseInt(e.target.value, 10))}
-                min="0"
-                max="59"
-                placeholder="Minutes"
-                className="me-2"
-              />
-
-              <Form.Label className="fw-bold me-2">Seconds</Form.Label>
-              <Form.Control
-                type="number"
-                name="seconds"
-                value={seconds}
-                onChange={(e) => setSeconds(parseInt(e.target.value, 10))}
-                min="0"
-                max="59"
-                placeholder="Seconds"
-              />
-            </div>
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Priority</Form.Label>
-            <Form.Control
-              type="text"
-              name="priority"
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-              required
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3 d-flex align-items-center">
-            <Form.Check
-              type="checkbox"
-              label="Enabled"
-              className="fw-bold"
-              name="enabled"
-              checked={enabled}
-              onChange={(e) =>
-                setEnabled(e.target.checked ? e.target.checked : false)
-              }
             />
           </Form.Group>
 
           <div className="text-center">
             <Button variant="primary" type="submit">
-              Submit
+              Sign In
             </Button>
           </div>
         </Form>
-      </Container>
-    </div>
+      </StyledContainer>
+    </BackgroundDiv>
   );
 };
 

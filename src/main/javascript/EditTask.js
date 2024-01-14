@@ -1,43 +1,78 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.css";
+import styled from "styled-components";
 import { Container, Form, Button } from "react-bootstrap";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import NavBar from "./NavBar";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
-const EditTask = () => {
+// Styled Components
+const StyledWrapper = styled.div`
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  padding-left: 0;
+  z-index: -1;
+  background: linear-gradient(to bottom right, #ffd9fb, white);
+`;
+
+const StyledContainer = styled(Container)`
+  border: 1px solid black;
+  width: 700px;
+`;
+
+const StyledForm = styled(Form)`
+  width: 400px;
+`;
+
+const EditTask = ({}) => {
+  const [authToken, setauthToken] = useState("");
   const { id } = useParams();
-  const [task, setTask] = useState({});
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [timerType, setTimerType] = useState("");
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
-  const [priority, setPriority] = useState("");
-  const [enabled, setEnabled] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
+    const storedToken = sessionStorage.getItem("authToken");
+    if (storedToken) {
+      setauthToken(storedToken);
+    }
+
+    console.log("storedToken" + storedToken);
+    console.log("sessionStorage" + sessionStorage);
+  }, []);
+
+  useEffect(() => {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${authToken}`, // Include the authToken in the Authorization header
+      },
+    };
+
     const apiUrl = `http://localhost:8080/api/getTask/${id}`;
 
-    fetch(apiUrl)
-      .then((response) => response.json())
-      .then((task) => {
-        setTask(task);
+    console.log(id);
+    console.log("config" + config);
+
+    axios
+      .get(apiUrl, config)
+      .then((response) => {
+        const task = response.data;
+        console.log(task);
         setName(task.name);
         setDescription(task.description);
         setTimerType(task.timerType);
-        console.log(timerType);
-        setHours(task.seconds / 3600);
-        setMinutes((task.seconds % 3600) / 60);
+        setHours(Math.floor(task.seconds / 3600));
+        setMinutes(Math.floor((task.seconds % 3600) / 60));
         setSeconds(task.seconds % 60);
-        setPriority(task.priority);
-        setEnabled(task.enabled);
       })
       .catch((error) => console.error(error));
-  }, [id]);
+  }, [authToken]);
 
   async function save(task) {
     task.preventDefault();
@@ -50,14 +85,17 @@ const EditTask = () => {
       description,
       timerType: timerType,
       seconds: totalSeconds,
-      priority: parseInt(priority),
-      enabled: Boolean(enabled),
     };
 
-    console.log(timerType);
-
     try {
-      await axios.post("/api/editTask", taskData);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${authToken}`, // Include the authToken in the Authorization header
+        },
+      };
+      console.log("config" + config);
+
+      await axios.post("/api/editTask", taskData, config);
       navigate("/my-tasks");
       alert("Task Edited successfully");
     } catch (error) {
@@ -66,11 +104,11 @@ const EditTask = () => {
   }
 
   return (
-    <div>
+    <StyledWrapper>
       <NavBar />
-      <Container className="my-5 p-5" style={{ border: "1px solid black" }}>
+      <StyledContainer className="my-5 p-5">
         <h4 className="text-center">Edit Task</h4>
-        <Form className="col-md-6 offset-md-3" onSubmit={save}>
+        <StyledForm className="col-md-6 offset-md-3" onSubmit={save}>
           <Form.Group className="mb-3">
             <Form.Label className="fw-bold">Name</Form.Label>
             <Form.Control
@@ -106,7 +144,7 @@ const EditTask = () => {
             </Form.Select>
           </Form.Group>
 
-          <Form.Group className="mb-3">
+          <Form.Group className="mb-3" style={{ width: "400px" }}>
             <Form.Label className="fw-bold">Timer</Form.Label>
 
             <div className="d-flex align-items-center">
@@ -145,39 +183,14 @@ const EditTask = () => {
               />
             </div>
           </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Priority</Form.Label>
-            <Form.Control
-              type="text"
-              name="priority"
-              value={priority}
-              onChange={(e) => setPriority(e.target.value)}
-              required
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3 d-flex align-items-center">
-            <Form.Check
-              type="checkbox"
-              label="Enabled"
-              className="fw-bold"
-              name="enabled"
-              checked={enabled}
-              onChange={(e) =>
-                setEnabled(e.target.checked ? e.target.checked : false)
-              }
-            />
-          </Form.Group>
-
           <div className="text-center">
             <Button variant="primary" type="submit">
               Save Changes
             </Button>
           </div>
-        </Form>
-      </Container>
-    </div>
+        </StyledForm>
+      </StyledContainer>
+    </StyledWrapper>
   );
 };
 
