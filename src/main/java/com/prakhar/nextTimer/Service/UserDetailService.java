@@ -18,7 +18,18 @@ public class UserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> optionalUser = userRepository.findByEmail(username);
-        return optionalUser.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        try {
+
+            Optional<User> userOptional = userRepository.findByEmail(username);
+
+            return userOptional.map(user -> new org.springframework.security.core.userdetails.User(
+                            String.valueOf(user.getId()),
+                            user.getPassword(),
+                            user.getAuthorities()))
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        } catch (NumberFormatException e) {
+            throw new UsernameNotFoundException("Invalid user ID format");
+        }
     }
 }

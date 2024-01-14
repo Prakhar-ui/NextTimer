@@ -1,47 +1,94 @@
 import React, { useEffect, useState } from "react";
+import axios from "axios";
+import styled from "styled-components";
 import "bootstrap/dist/css/bootstrap.css";
 import { Container, Table, Button } from "react-bootstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEdit, faTrash } from "@fortawesome/free-solid-svg-icons";
 import NavBar from "./NavBar";
 import { useNavigate } from "react-router-dom";
-import MyTaskTimer from "./MyTaskTimer";
-const MyTasks = () => {
+import { faEdit, faTrash, faPlay } from "@fortawesome/free-solid-svg-icons";
+
+const Wrapper = styled.div`
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+  padding-left: 0;
+  z-index: -1;
+  background: linear-gradient(to bottom right, #ffd9fb, white);
+`;
+
+const StyledContainer = styled(Container)`
+  width: 100%;
+  object-fit: cover;
+  position: absolute;
+  left: 0;
+  right: 0;
+  margin: auto;
+`;
+
+const StyledTable = styled(Table)`
+  background: white;
+`;
+
+const MyTasks = ({}) => {
+  const [authToken, setauthToken] = useState("");
   const [task, setTask] = useState(null);
-  const [deleteStatus, setDeleteStatus] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const apiUrl = "http://localhost:8080/api/myTasks";
+    const storedToken = sessionStorage.getItem("authToken");
+    if (storedToken) {
+      setauthToken(storedToken);
+    }
+  }, []);
 
-    fetch(apiUrl)
-      .then((response) => response.json())
-      .then((task) => setTask(task))
-      .catch((error) => console.error(error));
-    setDeleteStatus(null);
-  }, [deleteStatus]);
+  useEffect(() => {
+    if (authToken) {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${authToken}`, // Include the authToken in the Authorization header
+        },
+      };
+
+      const apiUrl = "http://localhost:8080/api/myTasks";
+
+      axios
+        .get(apiUrl, config)
+        .then((response) => {
+          const task = response.data;
+          setTask(task);
+        })
+        .catch((error) => console.error(error));
+    }
+  }, [authToken]);
 
   const handleDeleteClick = (id) => {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    };
+
     const deleteTaskapiUrl = `http://localhost:8080/api/deleteTask/${id}`;
 
-    fetch(deleteTaskapiUrl, {
-      method: "DELETE",
-    })
-      .then((response) => {
-        if (response.ok) {
-          setDeleteStatus("deleted successfully");
-        } else {
-          setDeleteStatus("error");
-        }
+    axios
+      .delete(deleteTaskapiUrl, config)
+      .then(() => {
+        alert("Task deleted successfully");
+        window.location.reload();
       })
       .catch((error) => {
-        setDeleteStatus("error");
-        console.error("Error:", error);
+        // Log the detailed error information
+        console.error("Error:", error.response);
       });
   };
 
   const handleEditTask = (id) => {
     navigate(`/edit-task/${id}`, { replace: true });
+  };
+
+  const handlePlayTimer = (id) => {
+    navigate(`/task-timer/${id}`, { replace: true });
   };
 
   const formatDuration = ({ seconds }) => {
@@ -76,20 +123,18 @@ const MyTasks = () => {
   };
 
   return (
-    <div>
+    <Wrapper>
       <NavBar />
-      <Container className="my-5 col-md-8">
-        <Table striped bordered hover responsive className="text-nowrap">
+      <StyledContainer className="my-5 col-md-8">
+        <StyledTable striped bordered hover responsive className="text-nowrap">
           <thead className="text-center">
-            <tr > 
+            <tr>
               <th>No. </th>
-              <th style={{ width: "400px"}}>Timer</th>
+              <th style={{ width: "40px" }}>Timer</th>
               <th>Name</th>
               <th>Description</th>
               <th>Timer-Type</th>
               <th>Duration</th>
-              <th>Priority</th>
-              <th>Enabled</th>
               <th>Edit Task</th>
               <th>Delete Task</th>
             </tr>
@@ -99,19 +144,19 @@ const MyTasks = () => {
               task.map((t) => (
                 <tr key={t.id}>
                   <td>{t.id}</td>
-                  <MyTaskTimer seconds={t.seconds} />
+                  <td>
+                    <Button
+                      variant="primary"
+                      onClick={() => handlePlayTimer(t.id)}
+                    >
+                      <FontAwesomeIcon icon={faPlay} />
+                    </Button>
+                  </td>
                   <td>{t.name}</td>
                   <td>{t.description}</td>
                   <td>{t.timerType}</td>
+
                   <td>{formatDuration({ seconds: t.seconds })}</td>
-                  <td>{t.priority}</td>
-                  <td>
-                    {t.enabled ? (
-                      <span style={{ color: "green" }}>&#x2713;</span>
-                    ) : (
-                      <span style={{ color: "red" }}>&#x2717;</span>
-                    )}
-                  </td>
                   <td>
                     <Button
                       variant="primary"
@@ -131,18 +176,9 @@ const MyTasks = () => {
                 </tr>
               ))}
           </tbody>
-        </Table>
-        {deleteStatus && (
-          <div>
-            {deleteStatus === "deleted successfully" ? (
-              <div className="alert alert-success">Deleted successfully</div>
-            ) : (
-              <div className="alert alert-danger">Error deleting task</div>
-            )}
-          </div>
-        )}
-      </Container>
-    </div>
+        </StyledTable>
+      </StyledContainer>
+    </Wrapper>
   );
 };
 

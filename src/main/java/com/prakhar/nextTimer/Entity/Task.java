@@ -14,8 +14,47 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Task {
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getTimerType() {
+        return timerType;
+    }
+
+    public void setTimerType(String timerType) {
+        this.timerType = timerType;
+    }
+
+    public long getSeconds() {
+        return seconds;
+    }
+
+    public void setSeconds(long seconds) {
+        this.seconds = seconds;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,17 +63,21 @@ public class Task {
     private String description;
     private String timerType;
     private long seconds;
-    private int priority;
-    private Boolean enabled;
 
-    public Task(String name, String description, String timerType, long seconds, int priority, Boolean enabled) {
+    public Task(String name, String description, String timerType, long seconds) {
         this.id = null;
         this.name = name;
         this.description = description;
         this.timerType = timerType;
         this.seconds = seconds;
-        this.priority = priority;
-        this.enabled = enabled;
+    }
+
+    public Task(Long id, String name, String description, String timerType, long seconds) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.timerType = timerType;
+        this.seconds = seconds;
     }
 
     @Override
@@ -43,9 +86,6 @@ public class Task {
                 "name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", timerType='" + timerType + '\'' +
-                ", timer=" + seconds +
-                ", priority=" + priority +
-                ", enabled=" + enabled +
-                '}';
+                ", timer=" + seconds +  '}';
     }
 }

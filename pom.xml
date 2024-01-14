@@ -93,32 +93,33 @@
 			<plugin>
 				<groupId>com.github.eirslett</groupId>
 				<artifactId>frontend-maven-plugin</artifactId>
-				<version>1.12.1</version>
+				<version>1.15.0</version>
 				<executions>
 					<execution>
+						<id>install-node-and-npm</id>
 						<goals>
 							<goal>install-node-and-npm</goal>
 						</goals>
 					</execution>
 					<execution>
-						<id>npm install</id>
+						<id>npm-install</id>
 						<goals>
 							<goal>npm</goal>
 						</goals>
 					</execution>
 					<execution>
-						<id>npx run</id>
+						<id>npx-run</id>
 						<goals>
-						<goal>npx</goal>
+							<goal>npx</goal>
 						</goals>
 						<phase>generate-resources</phase>
 						<configuration>
-						<arguments>parcel build</arguments>
-					</configuration>
-						</execution>
+							<arguments>parcel build</arguments>
+						</configuration>
+					</execution>
 				</executions>
 				<configuration>
-					<nodeVersion>v16.14.2</nodeVersion>
+					<nodeVersion>v20.10.0</nodeVersion>
 				</configuration>
 			</plugin>
 		</plugins>
