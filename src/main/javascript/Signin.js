@@ -49,7 +49,6 @@ const Signin = ({}) => {
           },
         };
 
-        console.log(config);
 
         const apiUrl = `http://localhost:8080/getUserByUsername?username=${username}`;
 
@@ -57,7 +56,6 @@ const Signin = ({}) => {
 
         const user = response.data;
 
-        console.log(user);
 
         
         // Store the globalId in sessionStorage

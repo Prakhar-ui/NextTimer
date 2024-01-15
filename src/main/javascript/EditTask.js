@@ -43,8 +43,6 @@ const EditTask = ({}) => {
       setauthToken(storedToken);
     }
 
-    console.log("storedToken" + storedToken);
-    console.log("sessionStorage" + sessionStorage);
   }, []);
 
   useEffect(() => {
@@ -56,14 +54,12 @@ const EditTask = ({}) => {
 
     const apiUrl = `http://localhost:8080/api/getTask/${id}`;
 
-    console.log(id);
-    console.log("config" + config);
+
 
     axios
       .get(apiUrl, config)
       .then((response) => {
         const task = response.data;
-        console.log(task);
         setName(task.name);
         setDescription(task.description);
         setTimerType(task.timerType);
@@ -93,7 +89,6 @@ const EditTask = ({}) => {
           Authorization: `Bearer ${authToken}`, // Include the authToken in the Authorization header
         },
       };
-      console.log("config" + config);
 
       await axios.post("/api/editTask", taskData, config);
       navigate("/my-tasks");

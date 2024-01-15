@@ -160,12 +160,7 @@ const Home = ({}) => {
     return Math.floor((endOfYear - now) / 1000);
   };
 
-  console.log(
-    "RemainingSecondsforRetirement: " +
-      (RemainingSecondsforRetirement ? RemainingSecondsforRetirement : "null")
-  );
 
-  console.log("age: " + (age ? age : "null"));
 
   return (
     <Wrapper>
