@@ -4,7 +4,6 @@ import { Row, Col, Button } from "react-bootstrap";
 import styled from "styled-components";
 import NavBar from "./NavBar";
 import { FaPlay, FaPause, FaStop } from "react-icons/fa";
-import { config } from "process";
 import axios from "axios";
 
 const BlackSquare = styled.div`
