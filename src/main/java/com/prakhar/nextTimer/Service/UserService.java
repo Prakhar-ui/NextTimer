@@ -95,6 +95,22 @@ public class UserService {
         }
     }
 
+    public User getUserById(Long id) {
+        try {
+            Optional<User> optionalUser = userRepository.findById(id);
+            if (optionalUser.isPresent()) {
+                logger.info("User Retrieved successfully with id: {}", id);
+            } else {
+                logger.info("User Not Present with id: {}", id);
+            }
+
+            return optionalUser.orElse(null);
+        } catch (Exception e) {
+            logger.error("Error getting user by ID: {}", id, e);
+            throw e;
+        }
+    }
+
     public void editUser(EditUserDTO editUserDTO) {
         try {
             Optional<User> optionalUser = userRepository.findById(Long.valueOf(editUserDTO.getId()));
@@ -118,19 +134,4 @@ public class UserService {
         }
     }
 
-    public User getUserById(Long id) {
-        try {
-            Optional<User> optionalUser = userRepository.findById(id);
-            if (optionalUser.isPresent()) {
-                logger.info("User Retrieved successfully with id: {}", id);
-            } else {
-                logger.info("User Not Present with id: {}", id);
-            }
-
-            return optionalUser.orElse(null);
-        } catch (Exception e) {
-            logger.error("Error getting user by ID: {}", id, e);
-            throw e;
-        }
-    }
 }

@@ -38,4 +38,4 @@ node_modules
 .parcel-cache
 
 ### Application Properties ###
-*.properties
+src/main/resources/application.properties
