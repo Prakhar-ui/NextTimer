@@ -4,17 +4,13 @@ import com.prakhar.nextTimer.DTO.EditUserDTO;
 import com.prakhar.nextTimer.DTO.UserDTO;
 import com.prakhar.nextTimer.Entity.User;
 import com.prakhar.nextTimer.Repository.UserRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -22,11 +18,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-@Slf4j
 @SpringBootTest
 public class UserServiceTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceTest.class);
 
     @Mock
     private UserRepository userRepository;
@@ -66,7 +60,6 @@ public class UserServiceTest {
         assertEquals("newuser@example.com", savedUser.getEmail());
         assertEquals("encodedPassword", savedUser.getPassword());
 
-        System.out.println("result" + result);
         // Assert the result
         assertEquals("User Registered Successfully!", result);
     }
@@ -176,10 +169,10 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("Test Get User By Id")
+    @DisplayName("Test Get Task By Id")
     public void testGetUserById() {
 
-        User userById = new User("User1", 23, "User1@gmail.com", "encodedPassword1");
+        User userById = new User(1L,"User1", 23, "User1@gmail.com", "encodedPassword1");
 
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(userById));
 
