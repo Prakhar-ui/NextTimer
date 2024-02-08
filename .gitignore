@@ -35,3 +35,4 @@ node_modules
 ### Application Properties ###
 src/main/resources/application.properties
 src/main/java/com/prakhar/nextTimer/Config/DataLoader.java
+*.jpg
