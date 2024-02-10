@@ -1,6 +1,6 @@
 # NextTimer
 
-![NextTimer Logo](NextTimer/src/main/resources/static/images/bg.png)
+![NextTimer Logo](src/main/resources/static/images/bg.png)
 
 ---
 
