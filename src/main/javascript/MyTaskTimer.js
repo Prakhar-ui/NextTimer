@@ -135,8 +135,23 @@ const MyTaskTimer = ({}) => {
     if (isRunning) {
       timer = setInterval(() => {
         if (hours === 0 && minutes === 0 && currentSeconds === 0) {
-          alert("Timer Finished");
+          const config = {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          };
+          const timerData = {
+            id: id,
+            seconds: 0,
+          };
+          axios
+            .post("http://localhost:8080/api/postSeconds", timerData, config)
 
+            .catch((error) => {
+              console.error("Error posting timer data:", error);
+            });
+          alert("Timer Finished");
+          navigate(`/my-tasks`, { replace: true });
           clearInterval(timer);
           setIsRunning(false);
         } else {

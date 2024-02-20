@@ -44,6 +44,7 @@ const StyledTable = styled(Table)`
 const MyTasks = ({}) => {
   const [authToken, setauthToken] = useState("");
   const [task, setTask] = useState(null);
+  const [serialNumber, setSerialNumber] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -68,6 +69,7 @@ const MyTasks = ({}) => {
         .then((response) => {
           const task = response.data;
           setTask(task);
+          setSerialNumber(1);
         })
         .catch((error) => console.error(error));
     }
@@ -152,9 +154,9 @@ const MyTasks = ({}) => {
           </thead>
           <tbody className="text-center">
             {task &&
-              task.map((t) => (
+              task.map((t, index) => (
                 <tr key={t.id}>
-                  <td>{t.id}</td>
+                  <td>{serialNumber + index}</td>
                   <td>
                     <Button
                       variant="primary"

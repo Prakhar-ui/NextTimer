@@ -188,6 +188,7 @@ const EditProfile = ({}) => {
         username: oldEmail,
         password: old_password,
       };
+      console.log(userData);
 
       const response = await axios.post("/login", userData);
 
@@ -207,83 +208,81 @@ const EditProfile = ({}) => {
       <NavBar />
       <StyledContainer className="my-5 p-5">
         <h4 className="text-center">Edit Profile</h4>
-        <StyledForm className="col-md-6 offset-md-3" onSubmit={save}>
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Name</Form.Label>
-            <Form.Control
-              type="text"
-              name="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </Form.Group>
+        <StyledForm className="col-md-6 offset-md-3">
+          <Form onSubmit={save}>
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-bold">Name</Form.Label>
+              <Form.Control
+                type="text"
+                name="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-bold">Age</Form.Label>
+              <Form.Control
+                type="text"
+                name="age"
+                value={age}
+                onChange={(e) => setAge(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-bold">Email</Form.Label>
+              <Form.Control
+                type="email"
+                name="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-bold">Change Password</Form.Label>
+              <Button
+                variant="secondary"
+                className="ms-2"
+                onClick={toggleChangePassword}
+              >
+                {changePassword ? "Cancel" : "Change Password"}
+              </Button>
+            </Form.Group>
+            {changePassword && (
+              <>
+                <Form.Group className="mb-3">
+                  <Form.Label className="fw-bold">Old Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    name="oldPassword"
+                    onChange={(e) => setOld_Password(e.target.value)}
+                  />
+                </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Age</Form.Label>
-            <Form.Control
-              type="text"
-              name="age"
-              value={age}
-              onChange={(e) => setAge(e.target.value)}
-            />
-          </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label className="fw-bold">New Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    name="newPassword"
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Email</Form.Label>
-            <Form.Control
-              type="email"
-              name="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </Form.Group>
-
-          <Form.Group className="mb-3">
-            <Form.Label className="fw-bold">Change Password</Form.Label>
-            <Button
-              variant="secondary"
-              className="ms-2"
-              onClick={toggleChangePassword}
-            >
-              {changePassword ? "Cancel" : "Change Password"}
-            </Button>
-          </Form.Group>
-
-          {changePassword && (
-            <>
-              <Form.Group className="mb-3">
-                <Form.Label className="fw-bold">Old Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="oldPassword"
-                  onChange={(e) => setOld_Password(e.target.value)}
-                />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label className="fw-bold">New Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="newPassword"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </Form.Group>
-
-              <Form.Group className="mb-3">
-                <Form.Label className="fw-bold">Confirm Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  name="confirmPassword"
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                />
-              </Form.Group>
-            </>
-          )}
-          <div className="text-center">
-            <Button variant="primary" type="submit">
-              Save Changes
-            </Button>
-          </div>
+                <Form.Group className="mb-3">
+                  <Form.Label className="fw-bold">Confirm Password</Form.Label>
+                  <Form.Control
+                    type="password"
+                    name="confirmPassword"
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </Form.Group>
+              </>
+            )}
+            <div className="text-center">
+              <Button variant="primary" type="submit">
+                Save Changes
+              </Button>
+            </div>
+          </Form>
         </StyledForm>
       </StyledContainer>
     </Wrapper>

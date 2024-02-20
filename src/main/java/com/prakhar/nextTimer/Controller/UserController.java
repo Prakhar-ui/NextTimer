@@ -45,6 +45,18 @@ public class UserController {
         }
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody UserDTO userDTO) {
+        try {
+            String result = userService.loginUser(userDTO);
+            logger.info("User Login Success: {}", result);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            logger.error("Error during user logni==in", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+        }
+    }
+
     @GetMapping("/getUserByUsername")
     public ResponseEntity<User> getUserByUsername(@RequestParam String username) {
         try {
