@@ -8,10 +8,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 // Styled Components
-const StyledWrapper = styled.div`
+
+const Wrapper = styled.div`
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
+  height: 100%;
+  object-fit: cover;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: auto;
   padding-left: 0;
   z-index: -1;
   background: linear-gradient(to bottom right, #ffd9fb, white);
@@ -19,11 +24,15 @@ const StyledWrapper = styled.div`
 
 const StyledContainer = styled(Container)`
   border: 1px solid black;
-  width: 700px;
+  max-width: 90%;
+  width: 600px;
+  margin: auto;
 `;
 
-const StyledForm = styled(Form)`
+const StyledForm = styled(Container)`
+  max-width: 90%;
   width: 400px;
+  margin: auto;
 `;
 
 const EditTask = ({}) => {
@@ -35,6 +44,7 @@ const EditTask = ({}) => {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
+  const [countChars, setCountChars] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,7 +52,6 @@ const EditTask = ({}) => {
     if (storedToken) {
       setauthToken(storedToken);
     }
-
   }, []);
 
   useEffect(() => {
@@ -53,8 +62,6 @@ const EditTask = ({}) => {
     };
 
     const apiUrl = `http://localhost:8080/api/getTask/${id}`;
-
-
 
     axios
       .get(apiUrl, config)
@@ -98,8 +105,16 @@ const EditTask = ({}) => {
     }
   }
 
+  useEffect(() => {
+    // Count spaces when description changes
+    const countCharsFunction = (text) => {
+      return text.length;
+    };
+    setCountChars(countCharsFunction(description));
+  }, [description]);
+
   return (
-    <StyledWrapper>
+    <Wrapper>
       <NavBar />
       <StyledContainer className="my-5 p-5">
         <h4 className="text-center">Edit Task</h4>
@@ -117,12 +132,20 @@ const EditTask = ({}) => {
           <Form.Group className="mb-3">
             <Form.Label className="fw-bold">Description</Form.Label>
             <Form.Control
-              type="text"
-              name="description"
+              as="textarea"
+              rows={2}
+              maxLength={150}
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => {
+                setDescription(e.target.value);
+                setCountChars(e.target.value.trim().length);
+              }}
+              style={{ resize: "none" }}
               required
             />
+            <div style={{ textAlign: "right", fontSize: "12px" }}>
+              {countChars}/150 chars
+            </div>
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -139,11 +162,11 @@ const EditTask = ({}) => {
             </Form.Select>
           </Form.Group>
 
-          <Form.Group className="mb-3" style={{ width: "400px" }}>
+          <Form.Group className="mb-3">
             <Form.Label className="fw-bold">Timer</Form.Label>
 
-            <div className="d-flex align-items-center">
-              <Form.Label className="fw-bold me-2">Hours</Form.Label>
+            <div>
+              <Form.Label className="fw-bold">Hours</Form.Label>
               <Form.Control
                 type="number"
                 name="hours"
@@ -153,8 +176,10 @@ const EditTask = ({}) => {
                 placeholder="Hours"
                 className="me-2"
               />
+            </div>
 
-              <Form.Label className="fw-bold me-2">Minutes</Form.Label>
+            <div>
+              <Form.Label className="fw-bold">Minutes</Form.Label>
               <Form.Control
                 type="number"
                 name="minutes"
@@ -165,8 +190,10 @@ const EditTask = ({}) => {
                 placeholder="Minutes"
                 className="me-2"
               />
+            </div>
 
-              <Form.Label className="fw-bold me-2">Seconds</Form.Label>
+            <div>
+              <Form.Label className="fw-bold">Seconds</Form.Label>
               <Form.Control
                 type="number"
                 name="seconds"
@@ -185,7 +212,7 @@ const EditTask = ({}) => {
           </div>
         </StyledForm>
       </StyledContainer>
-    </StyledWrapper>
+    </Wrapper>
   );
 };
 

@@ -59,20 +59,16 @@ const NavBar = ({}) => {
     setauthToken(false);
     setglobalId("");
 
-    sessionStorage.removeItem('authToken');
-    sessionStorage.removeItem('globalId');
-
+    sessionStorage.removeItem("authToken");
+    sessionStorage.removeItem("globalId");
 
     // You may want to redirect the user or perform other actions upon successful authentication
     navigate("/");
     window.location.reload();
   };
 
-  
-
   useEffect(() => {
     const fetchData = async () => {
-
       const storedToken = sessionStorage.getItem("authToken");
       const storedglobalId = sessionStorage.getItem("globalId");
 

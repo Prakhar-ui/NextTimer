@@ -7,10 +7,14 @@ import NavBar from "./NavBar";
 import axios from "axios";
 import styled from "styled-components";
 
-const BackgroundContainer = styled.div`
+const Wrapper = styled.div`
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
+  height: 100%;
+  object-fit: cover;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: auto;
   padding-left: 0;
   z-index: -1;
   background: linear-gradient(to bottom right, #ffd9fb, white);
@@ -18,7 +22,10 @@ const BackgroundContainer = styled.div`
 
 const StyledContainer = styled(BootstrapContainer)`
   border: 1px solid black;
-  width: 700px;
+  max-width: 90%;
+  width: 400px;
+  padding: 20px;
+  margin: auto;
 `;
 
 const Signup = ({}) => {
@@ -74,7 +81,6 @@ const Signup = ({}) => {
     };
 
     try {
-
       // Make a request to your authentication endpoint
       const response = await axios.post("/registeruser", userData);
 
@@ -97,11 +103,11 @@ const Signup = ({}) => {
   }
 
   return (
-    <BackgroundContainer>
+    <Wrapper>
       <NavBar />
       <StyledContainer className="my-5 p-5">
         <h4 className="text-center">Register</h4>
-        <Form className="col-md-6 offset-md-3" onSubmit={save}>
+        <Form onSubmit={save}>
           <Form.Group className="mb-3">
             <Form.Label className="fw-bold">Name</Form.Label>
             <Form.Control
@@ -109,6 +115,7 @@ const Signup = ({}) => {
               name="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              style={{ width: "100%" }}
             />
           </Form.Group>
 
@@ -120,6 +127,7 @@ const Signup = ({}) => {
               value={age}
               onChange={(e) => setAge(e.target.value)}
               min="0"
+              style={{ width: "100%" }}
             />
           </Form.Group>
 
@@ -131,6 +139,7 @@ const Signup = ({}) => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              style={{ width: "100%" }}
             />
           </Form.Group>
 
@@ -142,6 +151,7 @@ const Signup = ({}) => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              style={{ width: "100%" }}
             />
           </Form.Group>
 
@@ -152,7 +162,7 @@ const Signup = ({}) => {
           </div>
         </Form>
       </StyledContainer>
-    </BackgroundContainer>
+    </Wrapper>
   );
 };
 

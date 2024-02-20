@@ -6,22 +6,30 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import NavBar from "./NavBar";
 import axios from "axios";
 
-const MainContainer = styled.div`
+const Wrapper = styled.div`
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
-  paddingleft: 0;
-  zindex: -1;
+  height: 100%;
+  object-fit: cover;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: auto;
+  padding-left: 0;
+  z-index: -1;
   background: linear-gradient(to bottom right, #ffd9fb, white);
 `;
 
 const StyledContainer = styled(Container)`
   border: 1px solid black;
-  width: 700px;
+  max-width: 90%;
+  width: 600px;
+  margin: auto;
 `;
 
-const StyledForm = styled(Form)`
+const StyledForm = styled(Container)`
+  max-width: 90%;
   width: 400px;
+  margin: auto;
 `;
 
 const CreateTask = ({}) => {
@@ -32,8 +40,9 @@ const CreateTask = ({}) => {
   const [hours, setHours] = useState(0);
   const [minutes, setMinutes] = useState(0);
   const [seconds, setSeconds] = useState(0);
-  
-  const config = { 
+  const [countChars, setCountChars] = useState(0);
+
+  const config = {
     headers: {
       Authorization: `Bearer ${authToken}`,
     },
@@ -50,8 +59,6 @@ const CreateTask = ({}) => {
       timerType: timerType,
       seconds: totalSeconds,
     };
-
-    
 
     try {
       await axios.post("/api/newTask", taskData, config);
@@ -71,13 +78,21 @@ const CreateTask = ({}) => {
 
   useEffect(() => {
     const storedToken = sessionStorage.getItem("authToken");
-    if (storedToken ) {
+    if (storedToken) {
       setauthToken(storedToken);
     }
   }, [authToken]);
 
+  useEffect(() => {
+    // Count spaces when description changes
+    const countCharsFunction = (text) => {
+      return text.length;
+    };
+    setCountChars(countCharsFunction(description));
+  }, [description]);
+
   return (
-    <MainContainer>
+    <Wrapper>
       <NavBar />
       <StyledContainer className="my-5 p-5">
         <h4 className="text-center">Create Task</h4>
@@ -95,12 +110,20 @@ const CreateTask = ({}) => {
           <Form.Group className="mb-3">
             <Form.Label className="fw-bold">Description</Form.Label>
             <Form.Control
-              type="text"
-              name="description"
+              as="textarea"
+              rows={2}
+              maxLength={150}
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onChange={(e) => {
+                setDescription(e.target.value);
+                setCountChars(e.target.value.trim().length);
+              }}
+              style={{ resize: "none" }}
               required
             />
+            <div style={{ textAlign: "right", fontSize: "12px" }}>
+              {countChars}/150 chars
+            </div>
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -117,11 +140,11 @@ const CreateTask = ({}) => {
             </Form.Select>
           </Form.Group>
 
-          <Form.Group className="mb-3" style={{ width: "400px" }}>
+          <Form.Group className="mb-3">
             <Form.Label className="fw-bold">Timer</Form.Label>
 
-            <div className="d-flex align-items-center">
-              <Form.Label className="fw-bold me-2">Hours</Form.Label>
+            <div>
+              <Form.Label className="fw-bold">Hours</Form.Label>
               <Form.Control
                 type="number"
                 name="hours"
@@ -131,8 +154,10 @@ const CreateTask = ({}) => {
                 placeholder="Hours"
                 className="me-2"
               />
+            </div>
 
-              <Form.Label className="fw-bold me-2">Minutes</Form.Label>
+            <div>
+              <Form.Label className="fw-bold">Minutes</Form.Label>
               <Form.Control
                 type="number"
                 name="minutes"
@@ -143,8 +168,10 @@ const CreateTask = ({}) => {
                 placeholder="Minutes"
                 className="me-2"
               />
+            </div>
 
-              <Form.Label className="fw-bold me-2">Seconds</Form.Label>
+            <div>
+              <Form.Label className="fw-bold">Seconds</Form.Label>
               <Form.Control
                 type="number"
                 name="seconds"
@@ -163,7 +190,7 @@ const CreateTask = ({}) => {
           </div>
         </StyledForm>
       </StyledContainer>
-    </MainContainer>
+    </Wrapper>
   );
 };
 

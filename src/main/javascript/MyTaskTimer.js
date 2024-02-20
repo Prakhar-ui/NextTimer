@@ -6,79 +6,79 @@ import NavBar from "./NavBar";
 import { FaPlay, FaPause, FaStop } from "react-icons/fa";
 import axios from "axios";
 
-const BlackSquare = styled.div`
-  background-color: #000;
-  margin: 10px;
-  display: inline-block;
-  border-radius: 5px;
-  position: relative; /* Make the parent relative to position the pseudo-element */
-`;
-
-const BlackSquareDesc = styled.div`
-  background-color: #000; /* Adjust padding for spacing between the number and the black square */
-  margin: 10px;
-  display: inline-block;
-  border-radius: 5px; /* Adjust border radius for rounded corners */
-`;
-
-const StyledColDesc = styled.div`
-  font-size: 50px;
-  font-weight: bold;
-  color: #fff; /* White text color */
-  display: inline-block; /* Make sure each column is inline-block */
-`;
-
-const StyledCol = styled.div`
-  font-size: 400px;
-  font-weight: bold;
-  color: #fff; /* White text color */
-  display: inline-block; /* Make sure each column is inline-block */
-`;
-
-const StyledColon = styled.div`
-  font-size: 300px;
-  font-weight: bold;
-  color: #fff; /* White text color */
-  display: inline-block; /* Make sure each column is inline-block */
-`;
-
-const CenteredContainer = styled.div`
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  padding-left: 0;
-`;
-
-const TimerContainer = styled.div`
+const Wrapper = styled.div`
   width: 100%;
   height: 100%;
   object-fit: cover;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
+  overflow: auto;
+  padding-left: 0;
   z-index: -1;
-  text-align: center;
   background-color: #3ecf67;
+`;
+
+const TimerContainer = styled.div`
+  text-align: center;
 `;
 
 const Timer = styled.div`
   margin-top: 320px;
+  max-width: 90%;
+  width: 90%;
+  margin: auto;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  height: 50px;
 `;
 
 const Description = styled.div`
-  margin-top: 100px;
+  margin-top: 15vw;
+  max-width: 90%;
+  width: 2000px;
+  margin: auto;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  height: 50px;
 `;
 
 const Options = styled.div`
-  margin-top: 300px;
+  max-width: 90%;
+  margin: auto;
+`;
+
+const BlackSquareDesc = styled.div`
+  max-width: 90%;
+  background-color: #000;
+  margin: 10px;
+  display: inline-block;
+  border-radius: 1vw;
+  font-size: 3vw;
+`;
+
+const StyledColDesc = styled.div`
+  max-width: 90%;
+  font-weight: bold;
+  color: #fff;
+  display: inline-block;
+`;
+
+const BlackSquare = styled.div`
+  max-width: 90%;
+  background-color: #000;
+  margin: 1vw;
+  display: inline-block;
+  border-radius: 1vw;
+  font-size: 18vw;
+`;
+
+const StyledCol = styled.div`
+  max-width: 90%;
+  font-size: 20vw;
+  font-weight: bold;
+  color: #fff;
+  display: inline-block;
 `;
 
 const MyTaskTimer = ({}) => {
@@ -181,7 +181,7 @@ const MyTaskTimer = ({}) => {
   };
 
   return (
-    <CenteredContainer>
+    <Wrapper>
       <NavBar />
       <TimerContainer>
         <Description>
@@ -206,14 +206,14 @@ const MyTaskTimer = ({}) => {
               <StyledCol>
                 <BlackSquare>{formatTime(hours)[1]}</BlackSquare>
               </StyledCol>
-              <StyledColon>:</StyledColon>
+              <StyledCol>:</StyledCol>
               <StyledCol>
                 <BlackSquare>{formatTime(minutes)[0]}</BlackSquare>
               </StyledCol>
               <StyledCol>
                 <BlackSquare>{formatTime(minutes)[1]}</BlackSquare>
               </StyledCol>
-              <StyledColon>:</StyledColon>
+              <StyledCol>:</StyledCol>
               <StyledCol>
                 <BlackSquare>{formatTime(currentSeconds)[0]}</BlackSquare>
               </StyledCol>
@@ -244,7 +244,7 @@ const MyTaskTimer = ({}) => {
           </Row>
         </Options>
       </TimerContainer>
-    </CenteredContainer>
+    </Wrapper>
   );
 };
 

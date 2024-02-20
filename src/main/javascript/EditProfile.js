@@ -9,8 +9,12 @@ import axios from "axios";
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
+  height: 100%;
+  object-fit: cover;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: auto;
   padding-left: 0;
   z-index: -1;
   background: linear-gradient(to bottom right, #ffd9fb, white);
@@ -18,13 +22,15 @@ const Wrapper = styled.div`
 
 const StyledContainer = styled(Container)`
   border: 1px solid black;
-  width: 700px;
+  max-width: 90%;
+  width: 600px;
+  margin: auto;
 `;
 
-const StyledForm = styled(Form)`
-  &.col-md-6 {
-    offset-md-3;
-  }
+const StyledForm = styled(Container)`
+  max-width: 90%;
+  width: 400px;
+  margin: auto;
 `;
 
 const EditProfile = ({}) => {

@@ -6,10 +6,14 @@ import "@fortawesome/fontawesome-free/css/all.min.css";
 import NavBar from "./NavBar";
 import axios from "axios";
 
-const BackgroundDiv = styled.div`
+const Wrapper = styled.div`
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
+  height: 100%;
+  object-fit: cover;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: auto;
   padding-left: 0;
   z-index: -1;
   background: linear-gradient(to bottom right, #ffd9fb, white);
@@ -17,7 +21,10 @@ const BackgroundDiv = styled.div`
 
 const StyledContainer = styled(Container)`
   border: 1px solid black;
-  width: 700px;
+  max-width: 90%;
+  width: 400px;
+  padding: 20px;
+  margin: auto;
 `;
 
 const Signin = ({}) => {
@@ -49,21 +56,16 @@ const Signin = ({}) => {
           },
         };
 
-
         const apiUrl = `http://localhost:8080/getUserByUsername?username=${username}`;
 
         const response = await axios.get(apiUrl, config);
 
         const user = response.data;
 
-
-        
         // Store the globalId in sessionStorage
         sessionStorage.setItem("globalId", user.id);
 
         navigate("/");
-
-
       } catch (error) {
         console.error("Error while setting id", error);
       }
@@ -80,11 +82,11 @@ const Signin = ({}) => {
   }
 
   return (
-    <BackgroundDiv>
+    <Wrapper>
       <NavBar />
       <StyledContainer className="my-5 p-5">
         <h4 className="text-center">Sign In</h4>
-        <Form className="col-md-6 offset-md-3" onSubmit={handleSignIn}>
+        <Form onSubmit={handleSignIn}>
           <Form.Group className="mb-3">
             <Form.Label className="fw-bold">Username</Form.Label>
             <Form.Control
@@ -113,7 +115,7 @@ const Signin = ({}) => {
           </div>
         </Form>
       </StyledContainer>
-    </BackgroundDiv>
+    </Wrapper>
   );
 };
 

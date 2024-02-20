@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Row, Col } from "react-bootstrap";
 
-const TimerWrapper = styled(Row)`
+const Wrapper = styled(Row)`
   text-align: center;
   margin: 0;
   align-items: stretch;
@@ -107,7 +107,7 @@ const HomeTimer = ({ seconds }) => {
     (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
 
   return (
-    <TimerWrapper className="mx-0">
+    <Wrapper className="mx-0">
       <TimerText>
         {hours === 0 && years === 0 && days === 0 && (
           <span>
@@ -136,7 +136,7 @@ const HomeTimer = ({ seconds }) => {
           </span>
         )}
       </TimerText>
-    </TimerWrapper>
+    </Wrapper>
   );
 };
 

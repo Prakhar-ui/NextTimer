@@ -10,19 +10,30 @@ import { faEdit, faTrash, faPlay } from "@fortawesome/free-solid-svg-icons";
 
 const Wrapper = styled.div`
   width: 100%;
-  height: 100vh;
-  overflow: hidden;
+  height: 100%;
+  object-fit: cover;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: auto;
   padding-left: 0;
   z-index: -1;
   background: linear-gradient(to bottom right, #ffd9fb, white);
 `;
 
+const TableCell = styled.td`
+  max-width: 200px;
+  word-wrap: break-word;
+  word-break: break-all;
+  white-space: normal;
+  text-align: justify;
+`;
+
 const StyledContainer = styled(Container)`
-  width: 100%;
-  object-fit: cover;
-  position: absolute;
-  left: 0;
-  right: 0;
+  border: 1px solid black;
+  max-width: 90%;
+  width: 2000px;
+  padding: 20px;
   margin: auto;
 `;
 
@@ -153,7 +164,7 @@ const MyTasks = ({}) => {
                     </Button>
                   </td>
                   <td>{t.name}</td>
-                  <td>{t.description}</td>
+                  <TableCell>{t.description}</TableCell>
                   <td>{t.timerType}</td>
 
                   <td>{formatDuration({ seconds: t.seconds })}</td>

@@ -10,18 +10,12 @@ import axios from "axios";
 const Wrapper = styled.div`
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  padding-left: 0;
-  text-align: center;
-`;
-
-const BackgroundGradient = styled.div`
-  width: 100%;
-  height: 100%;
   object-fit: cover;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
+  overflow: auto;
+  padding-left: 0;
   z-index: -1;
   background: linear-gradient(to bottom right, #ffd9fb, white);
 `;
@@ -160,12 +154,9 @@ const Home = ({}) => {
     return Math.floor((endOfYear - now) / 1000);
   };
 
-
-
   return (
     <Wrapper>
       <NavBar />
-      <BackgroundGradient className="background-gradient" />
       <WelcomeHeading className="welcome-heading">
         Hi {name ? name : "Guest"}! Welcome to NextTimer
       </WelcomeHeading>
