@@ -9,5 +9,4 @@ public class NextTimerApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(NextTimerApplication.class, args);
 	}
-
 }

@@ -42,7 +42,7 @@ public class JwtService {
         }
     }
 
-    private Key getSignKey() {
+    protected Key getSignKey() {
         try {
             byte[] keyBytes = Decoders.BASE64.decode(SECRET);
             Key key = Keys.hmacShaKeyFor(keyBytes);
@@ -54,7 +54,7 @@ public class JwtService {
         }
     }
 
-    private String createToken(Map<String, Object> claims, Long id) {
+    protected String createToken(Map<String, Object> claims, Long id) {
         try {
             Date now = new Date();
             Date expiryDate = new Date(now.getTime() + expirationMs);
@@ -72,6 +72,8 @@ public class JwtService {
     public String extractUsername(String token) {
         try {
             String extractedUsername = extractClaim(token, Claims::getSubject);
+            System.out.println("token " + token);
+
             logger.info("Username Successfully Extracted");
             return extractedUsername;
         } catch (Exception e) {
