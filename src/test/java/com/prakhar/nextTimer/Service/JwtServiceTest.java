@@ -11,6 +11,7 @@ import io.jsonwebtoken.Claims;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.lang.reflect.Field;
 import java.security.Key;
@@ -33,11 +34,18 @@ public class JwtServiceTest {
 
     @Value("${jwt.expirationMs}")
     private long expirationMs;
+
+    private final PasswordEncoder passwordEncoder;
+
+    public JwtServiceTest(PasswordEncoder passwordEncoder) {
+        this.passwordEncoder = passwordEncoder;
+    }
+
     @Test
     @DisplayName("Test Generate Token")
     public void testGenerateToken() throws NoSuchFieldException, IllegalAccessException {
         // Given
-        Long id = 123L;
+        Long id = 1L;
 
         // Manually set the SECRET field using reflection
         Field secretField = jwtService.getClass().getDeclaredField("SECRET");
@@ -81,7 +89,7 @@ public class JwtServiceTest {
         secretField.set(jwtService, secret);
 
         Map<String, Object> claims = new HashMap<>();
-       
+
         String token = jwtService.createToken(claims,id);
 
         // When
@@ -194,7 +202,7 @@ public class JwtServiceTest {
         secretField.set(jwtService, secret);
 
         // Given
-        User userDetails = new User(1L,"Prakhar", 23, "prakha8380@gmail.com","123");
+        User userDetails = new User(1L,"test-name", 18, "test@gmail.com",passwordEncoder.encode("123"));
         // Generate a token with a future expiration date
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationMs);

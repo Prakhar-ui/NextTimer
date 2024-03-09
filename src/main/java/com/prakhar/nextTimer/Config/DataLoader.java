@@ -32,7 +32,7 @@ public class DataLoader implements CommandLineRunner {
 //        Task task1 = new Task(11L, "anime", "Dr Stone","One-Time", 21600L);
 //        Task task2 = new Task(22L, "study", "Coding","Daily", 10800L);
 //        Task task3 = new Task(33L, "games", "CS2","One-Time", 7200L);
-//        User user = new User("Prakhar", 23, "prakha8380@gmail.com",passwordEncoder.encode("123"));
+//        User user = new User("test-name", 18, "test@gmail.com",passwordEncoder.encode("123"));
 //        userRepository.save(user);
 //        taskRepository.save(task1);
 //        taskRepository.save(task2);
