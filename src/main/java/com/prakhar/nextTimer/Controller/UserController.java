@@ -33,7 +33,7 @@ public class UserController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @PostMapping("/registeruser")
+    @PostMapping("/registerUser")
     public ResponseEntity<String> saveUser(@RequestBody User user) {
         try {
             String result = userService.saveUser(user);
@@ -52,7 +52,7 @@ public class UserController {
             logger.info("User Login Success: {}", result);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
-            logger.error("Error during user logni==in", e);
+            logger.error("Error during user login", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
         }
     }
@@ -61,6 +61,7 @@ public class UserController {
     public ResponseEntity<User> getUserByUsername(@RequestParam String username) {
         try {
             User user = userService.getUser(username);
+            System.out.println(user);
             logger.info("User found by username: {}", username);
             return ResponseEntity.ok(user);
         } catch (UsernameNotFoundException e) {
@@ -118,11 +119,17 @@ public class UserController {
     public ResponseEntity<String> authenticateAndGetToken(@RequestBody UserDTO authRequest) {
         try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-
+            System.out.println(authentication.getPrincipal());
+            System.out.println(authentication.isAuthenticated());
+            System.out.println(authentication.getCredentials());
             if (authentication.isAuthenticated()) {
                 User user = userService.getUser(authRequest.getUsername());
+                System.out.println(user);
+
                 logger.info("Authentication successful for user: {}", authRequest.getUsername());
                 String token = jwtService.generateToken(user.getId());
+                System.out.println(token);
+
                 return ResponseEntity.ok(token);
             } else {
                 logger.error("Invalid user request for authentication");

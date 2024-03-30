@@ -22,8 +22,7 @@ public class ApiController {
         try {
             logger.info("Calling /today endpoint");
             RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> response = restTemplate.getForEntity(externalApiUrl, String.class);
-            return response;
+            return restTemplate.getForEntity(externalApiUrl, String.class);
         } catch (Exception e) {
             logger.error("Error calling /today endpoint", e);
             return ResponseEntity.status(500).body("Internal Server Error");
@@ -35,8 +34,7 @@ public class ApiController {
         try {
             logger.info("Calling /today-proxy endpoint");
             RestTemplate restTemplate = new RestTemplate();
-            ResponseEntity<String> response = restTemplate.getForEntity(externalApiUrl, String.class);
-            return response;
+            return restTemplate.getForEntity(externalApiUrl, String.class);
         } catch (Exception e) {
             logger.error("Error calling /today-proxy endpoint", e);
             return ResponseEntity.status(500).body("Internal Server Error");
