@@ -82,7 +82,6 @@ const StyledCol = styled.div`
 `;
 
 const MyTaskTimer = ({}) => {
-  const [authToken, setauthToken] = useState("");
   const { id } = useParams();
   const [task, setTask] = useState(null);
   const [name, setName] = useState("");
@@ -97,27 +96,19 @@ const MyTaskTimer = ({}) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedToken = sessionStorage.getItem("authToken");
-
-    if (storedToken) {
-      setauthToken(storedToken);
-    }
-  }, []);
-
-  useEffect(() => {
     let timer;
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${authToken}`, // Include the authToken in the Authorization header
-      },
+    const handleBeforeUnload = (event) => {
+      postTimer();
     };
 
-    if (task == null && authToken) {
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    if (task == null) {
       const apiUrl = `http://localhost:8080/api/getTask/${id}`;
 
       axios
-        .get(apiUrl, config)
+        .get(apiUrl, getConfig())
         .then((response) => {
           const task = response.data;
           setTask(task);
@@ -135,21 +126,7 @@ const MyTaskTimer = ({}) => {
     if (isRunning) {
       timer = setInterval(() => {
         if (hours === 0 && minutes === 0 && currentSeconds === 0) {
-          const config = {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          };
-          const timerData = {
-            id: id,
-            seconds: 0,
-          };
-          axios
-            .post("http://localhost:8080/api/postSeconds", timerData, config)
-
-            .catch((error) => {
-              console.error("Error posting timer data:", error);
-            });
+          postTimer();
           alert("Timer Finished");
           navigate(`/my-tasks`, { replace: true });
           clearInterval(timer);
@@ -165,34 +142,67 @@ const MyTaskTimer = ({}) => {
           } else {
             setCurrentSeconds((prevSeconds) => prevSeconds - 1);
           }
-          const timerData = {
-            id: id,
-            seconds: hours * 3600 + minutes * 60 + currentSeconds,
-          };
-
-          const config = {
-            headers: {
-              Authorization: `Bearer ${authToken}`,
-            },
-          };
-
-          axios
-            .post("http://localhost:8080/api/postSeconds", timerData, config)
-
-            .catch((error) => {
-              console.error("Error posting timer data:", error);
-            });
         }
       }, 1000);
     }
 
-    return () => clearInterval(timer);
-  }, [authToken, isRunning, currentSeconds, minutes, hours]);
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      clearInterval(timer);
+    };
+  }, [isRunning, currentSeconds, minutes, hours]);
 
   const formatTime = (value) => String(value).padStart(2, "0");
 
-  const handleStopTimer = () => {
-    navigate(`/my-tasks`, { replace: true });
+  const handleStopTimer = async () => {
+    try {
+      await postTimer();
+      navigate(`/my-tasks`, { replace: true });
+    } catch (error) {
+      console.error("Error Navigating to My Tasks", error);
+    }
+  };
+
+  const handlePauseTimer = () => {
+    if (isRunning) {
+      postTimer();
+      setIsRunning(false);
+    }
+  };
+
+  const handlePlayTimer = () => {
+    if (!isRunning) {
+      postTimer();
+      setIsRunning(true);
+    }
+  };
+
+  const postTimer = async () => {
+    const timerData = {
+      taskId: id,
+      seconds: hours * 3600 + minutes * 60 + currentSeconds,
+    };
+
+    try {
+      await axios.post(
+        "http://localhost:8080/api/postSeconds",
+        timerData,
+        getConfig()
+      );
+    } catch (error) {
+      console.error("Error posting timer data:", error);
+      throw error;
+    }
+  };
+
+  const getConfig = () => {
+    const storedToken = sessionStorage.getItem("authToken");
+    const config = {
+      headers: {
+        Authorization: `Bearer ${storedToken}`,
+      },
+    };
+    return config;
   };
 
   return (
@@ -242,17 +252,18 @@ const MyTaskTimer = ({}) => {
         <Options>
           <Row className="text-center mx-0 mt-3">
             <Col>
-              <Button variant="success" onClick={() => setIsRunning(true)}>
+              <Button variant="success" onClick={handlePlayTimer}>
                 <FaPlay />
               </Button>
             </Col>
             <Col>
-              <Button variant="warning" onClick={() => setIsRunning(false)}>
+              <Button variant="warning" onClick={handlePauseTimer}>
                 <FaPause />
               </Button>
             </Col>
             <Col>
               <Button variant="danger" onClick={handleStopTimer}>
+                Take a Break!
                 <FaStop />
               </Button>
             </Col>

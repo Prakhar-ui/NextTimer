@@ -1,19 +1,4 @@
 package com.prakhar.nextTimer.DTO;
 
-
-import lombok.*;
-
-@Getter
-@Setter
-@NoArgsConstructor
-@Data
-@AllArgsConstructor
-public class EditUserDTO {
-    private String id;
-    private String name;
-    private int age;
-    private String email;
-    private String password;
-
-
+public record EditUserDTO(Long id, String name, int age, String email, String password) {
 }

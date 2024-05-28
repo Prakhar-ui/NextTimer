@@ -128,10 +128,17 @@ const ZenQuotes = () => {
   };
 
   const pollImageAvailability = async () => {
-    const maxAttempts = 60; // Maximum attempts to check for the image
+    const maxAttempts = 10; // Maximum attempts to check for the image
     let attempts = 0;
+    const timeout = 10000;
+
+    const startTime = Date.now();
 
     while (attempts < maxAttempts) {
+      if (Date.now() - startTime >= timeout) {
+        // If the timeout period has passed, exit the loop
+        break;
+      }
       try {
         const response = await fetch(
           `http://localhost:8080/${localImagePath}`,

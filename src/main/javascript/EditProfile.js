@@ -34,145 +34,119 @@ const StyledForm = styled(Container)`
 `;
 
 const EditProfile = ({}) => {
-  const [authToken, setauthToken] = useState("");
-  const [globalId, setglobalId] = useState("");
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [oldEmail, setOldEmail] = useState("");
   const [email, setEmail] = useState("");
-  const [old_password, setOld_Password] = useState("");
+  const [oldPassword, setOldPassword] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [changePassword, setChangePassword] = useState(false);
-
-  function toggleChangePassword() {
-    setChangePassword(!changePassword);
-  }
-
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const storedToken = sessionStorage.getItem("authToken");
-    const storedglobalId = sessionStorage.getItem("globalId");
-
-    if (storedToken) {
-      setauthToken(storedToken);
-      setglobalId(storedglobalId);
-    }
-  }, []);
-
-  useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${authToken}`, // Include the authToken in the Authorization header
-      },
-    };
-
-    // Check if globalId is non-null and non-empty
-    if (authToken && globalId) {
-      const apiUrl = `http://localhost:8080/getUserById?id=${globalId}`;
-
-      axios
-        .get(apiUrl, config)
-        .then((response) => {
-          const user = response.data;
-          setName(user.name);
-          setAge(user.age);
-          setEmail(user.email);
-          setOldEmail(user.email);
-          setPassword(user.password);
-        })
-        .catch((error) => console.error(error));
-    }
-  }, [globalId, authToken]);
-
-  function checkPasswordEquality() {
-    return password === confirmPassword;
+  function getId() {
+    return sessionStorage.getItem("globalId");
   }
 
-  async function save(event) {
-    event.preventDefault(); // Prevent the default form submission
+  function getConfig() {
+    const storedToken = sessionStorage.getItem("authToken");
+    const config = {
+      headers: {
+        Authorization: `Bearer ${storedToken}`,
+      },
+    };
+    return config;
+  }
 
-    const updatedPassword = changePassword ? password : null;
+  useEffect(() => {
+    const apiUrl = `http://localhost:8080/getUserById?id=${getId()}`;
 
-    if (changePassword) {
-      try {
-        const passwordCheckResult = await checkOldPassword();
+    axios
+      .get(apiUrl, getConfig())
+      .then((response) => {
+        const user = response.data;
+        setName(user.name);
+        setAge(user.age);
+        setEmail(user.email);
+        setOldEmail(user.email);
+      })
+      .catch((error) => console.error(error));
+  }, []);
 
-        if (!passwordCheckResult) {
-          alert("Incorrect Old Password");
-          return;
-        }
-
-        if (!checkPasswordEquality()) {
-          alert("New password and confirm password do not match.");
-          return;
-        }
-
-        if (old_password === password) {
-          alert("Old Password and New Password Cannot be the same.");
-          return;
-        }
-      } catch (error) {
-        console.error("Error during password check", error);
-        return;
-      }
-    }
-
+  const userValidation = async () => {
     try {
-      // If checkOldPassword passes or no password change is required, proceed with the edit
-
-      const passwordRegex =
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/;
-
-      if (parseInt(age) > 100 || parseInt(age) <= 0 || parseInt(age) == "") {
+      // Age validation
+      if (parseInt(age) > 100 || parseInt(age) <= 0 || parseInt(age) === "") {
         alert("Please enter a valid age.");
-        return;
+        return false;
       }
 
       // Name length validation
       if (name.length > 50) {
         alert("Name must be less than 50 characters.");
-        return;
+        return false;
       }
 
       // Email format validation
       const emailRegex = /\S+@\S+\.\S+/;
       if (!emailRegex.test(email)) {
         alert("Please enter a valid email address.");
-        return;
+        return false;
       }
 
-      if (changePassword) {
-        if (password.length < 8) {
-          alert("Password must be at least 8 characters long.");
-          return;
+      // Password validation if a new password is provided
+      if (password !== "") {
+        const passwordCheckResult = await checkOldPassword();
+
+        if (!passwordCheckResult) {
+          alert("Incorrect Old Password");
+          return false;
         }
 
-        // Password complexity validation
+        const passwordRegex =
+          /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,}$/;
+
+        if (password !== confirmPassword) {
+          alert("New password and confirm password do not match.");
+          return false;
+        }
+
         if (!passwordRegex.test(password)) {
           alert(
-            "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character."
+            "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character."
           );
-          return;
+          return false;
+        }
+
+        if (oldPassword === password) {
+          alert("Old Password and New Password Cannot be the same.");
+          return false;
         }
       }
+      return true;
+    } catch (error) {
+      console.error("User Validation Failed", error);
+      throw error; // Propagate the error to the caller
+    }
+  };
 
+  async function save(event) {
+    event.preventDefault();
+
+    const isValid = await userValidation();
+    if (!isValid) {
+      return;
+    }
+
+    try {
       const userData = {
-        id: globalId,
+        id: getId(),
         name: name,
         age: age,
         email: email,
-        password: updatedPassword,
+        password: password,
       };
 
-      const config = {
-        headers: {
-          Authorization: `Bearer ${authToken}`, // Include the authToken in the Authorization header
-        },
-      };
-
-      await axios.post("/editUser", userData, config);
+      await axios.post("/editUser", userData, getConfig());
 
       navigate("/");
 
@@ -186,19 +160,14 @@ const EditProfile = ({}) => {
     try {
       const userData = {
         username: oldEmail,
-        password: old_password,
+        password: oldPassword,
       };
-      console.log(userData);
 
       const response = await axios.post("/login", userData);
 
-      if (response.data === "Password not matching") {
-        return false; // Password check successful
-      } else if (response.data === "Login Success") {
-        return true;
-      }
+      return response.status === 200;
     } catch (error) {
-      console.error("checkOldPassword failing", error);
+      console.error("Error during Old Password Validation", error);
       // Password check failed
     }
   }
@@ -238,45 +207,31 @@ const EditProfile = ({}) => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label className="fw-bold">Change Password</Form.Label>
-              <Button
-                variant="secondary"
-                className="ms-2"
-                onClick={toggleChangePassword}
-              >
-                {changePassword ? "Cancel" : "Change Password"}
-              </Button>
+              <Form.Label className="fw-bold">Old Password</Form.Label>
+              <Form.Control
+                type="password"
+                name="oldPassword"
+                onChange={(e) => setOldPassword(e.target.value)}
+              />
             </Form.Group>
-            {changePassword && (
-              <>
-                <Form.Group className="mb-3">
-                  <Form.Label className="fw-bold">Old Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    name="oldPassword"
-                    onChange={(e) => setOld_Password(e.target.value)}
-                  />
-                </Form.Group>
 
-                <Form.Group className="mb-3">
-                  <Form.Label className="fw-bold">New Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    name="newPassword"
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-bold">New Password</Form.Label>
+              <Form.Control
+                type="password"
+                name="newPassword"
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Form.Group>
 
-                <Form.Group className="mb-3">
-                  <Form.Label className="fw-bold">Confirm Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    name="confirmPassword"
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                  />
-                </Form.Group>
-              </>
-            )}
+            <Form.Group className="mb-3">
+              <Form.Label className="fw-bold">Confirm Password</Form.Label>
+              <Form.Control
+                type="password"
+                name="confirmPassword"
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+            </Form.Group>
             <div className="text-center">
               <Button variant="primary" type="submit">
                 Save Changes

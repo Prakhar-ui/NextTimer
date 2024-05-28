@@ -42,50 +42,37 @@ const StyledTable = styled(Table)`
 `;
 
 const MyTasks = ({}) => {
-  const [authToken, setauthToken] = useState("");
   const [task, setTask] = useState(null);
   const [serialNumber, setSerialNumber] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const storedToken = sessionStorage.getItem("authToken");
-    if (storedToken) {
-      setauthToken(storedToken);
-    }
+    const apiUrl = "http://localhost:8080/api/myTasks";
+    axios
+      .get(apiUrl, getConfig())
+      .then((response) => {
+        const task = response.data;
+        setTask(task);
+        setSerialNumber(1);
+      })
+      .catch((error) => console.error(error));
   }, []);
 
-  useEffect(() => {
-    if (authToken) {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${authToken}`, // Include the authToken in the Authorization header
-        },
-      };
-
-      const apiUrl = "http://localhost:8080/api/myTasks";
-
-      axios
-        .get(apiUrl, config)
-        .then((response) => {
-          const task = response.data;
-          setTask(task);
-          setSerialNumber(1);
-        })
-        .catch((error) => console.error(error));
-    }
-  }, [authToken]);
-
-  const handleDeleteClick = (id) => {
+  const getConfig = () => {
+    const storedToken = sessionStorage.getItem("authToken");
     const config = {
       headers: {
-        Authorization: `Bearer ${authToken}`,
+        Authorization: `Bearer ${storedToken}`,
       },
     };
+    return config;
+  };
 
+  const handleDeleteClick = (id) => {
     const deleteTaskapiUrl = `http://localhost:8080/api/deleteTask/${id}`;
 
     axios
-      .delete(deleteTaskapiUrl, config)
+      .delete(deleteTaskapiUrl, getConfig())
       .then(() => {
         alert("Task deleted successfully");
         window.location.reload();

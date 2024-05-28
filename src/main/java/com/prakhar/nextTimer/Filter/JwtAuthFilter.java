@@ -1,7 +1,6 @@
 package com.prakhar.nextTimer.Filter;
 
 import com.prakhar.nextTimer.Entity.User;
-import com.prakhar.nextTimer.Exception.CustomAuthorizationException;
 import com.prakhar.nextTimer.Repository.UserRepository;
 import com.prakhar.nextTimer.Service.JwtService;
 import com.prakhar.nextTimer.Service.UserDetailService;
@@ -9,6 +8,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,11 +19,12 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
 import java.util.Optional;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthFilter.class);
 
     @Autowired
     private JwtService jwtService;
@@ -34,7 +36,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     private UserDetailService userDetailService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException {
         try {
             String authHeader = request.getHeader("Authorization");
             String token = null;
@@ -44,7 +46,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 token = authHeader.substring(7);
                 userId = jwtService.extractUsername(token); // Change this line
             }
-
 
             if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 try {
@@ -57,6 +58,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
                         authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                         SecurityContextHolder.getContext().setAuthentication(authToken);
+                        logger.info("User authenticated successfully for user ID: {}", userId);
+
+                    } else {
+                        logger.warn("JWT token validation failed for user ID: {}", userId);
                     }
                 } catch (UsernameNotFoundException e) {
                     // Handle the case where the user details are not found
@@ -72,5 +77,5 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         }
     }
 
-    }
+}
 

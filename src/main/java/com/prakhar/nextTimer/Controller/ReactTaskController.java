@@ -1,9 +1,10 @@
 package com.prakhar.nextTimer.Controller;
 
+import com.prakhar.nextTimer.DTO.EditTaskDTO;
+import com.prakhar.nextTimer.DTO.TaskDTO;
 import com.prakhar.nextTimer.DTO.TimerDTO;
 import com.prakhar.nextTimer.Entity.Task;
 import com.prakhar.nextTimer.Service.TaskService;
-import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
-@Slf4j
 @RestController
 @CrossOrigin
 public class ReactTaskController {
@@ -29,7 +28,7 @@ public class ReactTaskController {
     public ResponseEntity<List<Task>> getMyTasks(Model model) {
         try {
             List<Task> tasks = taskService.getAllTasks();
-            logger.info("Retrieved all tasks successfully");
+            logger.info("Retrieved all tasks successfully" + tasks);
             return ResponseEntity.ok(tasks);
         } catch (Exception e) {
             logger.error("Error retrieving tasks", e);
@@ -50,9 +49,9 @@ public class ReactTaskController {
     }
 
     @GetMapping("/api/getTask/{id}")
-    public ResponseEntity<Optional<Task>> getTask(@PathVariable Long id) {
+    public ResponseEntity<Task> getTask(@PathVariable Long id) {
         try {
-            Optional<Task> task = taskService.getTaskById(id);
+            Task task = taskService.getTaskById(id);
             logger.info("Retrieved task with ID {} successfully", id);
             return ResponseEntity.ok(task);
         } catch (Exception e) {
@@ -86,7 +85,7 @@ public class ReactTaskController {
     }
 
     @PostMapping("/api/newTask")
-    public ResponseEntity<String> createTask(@RequestBody Task task) {
+    public ResponseEntity<String> createTask(@RequestBody TaskDTO task) {
         try {
             taskService.createTask(task);
             logger.info("Created a new task successfully");
@@ -98,9 +97,9 @@ public class ReactTaskController {
     }
 
     @PostMapping("/api/editTask")
-    public ResponseEntity<String> editTask(@RequestBody Task task) {
+    public ResponseEntity<String> editTask(@RequestBody EditTaskDTO editTaskDTO) {
         try {
-            taskService.editTask(task);
+            taskService.editTask(editTaskDTO);
             logger.info("Edited a task successfully");
             return ResponseEntity.ok("Task edited successfully");
         } catch (Exception e) {

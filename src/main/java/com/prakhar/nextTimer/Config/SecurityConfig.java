@@ -63,7 +63,7 @@ public class SecurityConfig {
                         .requestMatchers("/generateToken").permitAll()
                         .requestMatchers("/login").permitAll()
                         .requestMatchers("/index.js").permitAll()
-                        .requestMatchers("/registeruser").permitAll()
+                        .requestMatchers("/registerUser").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())

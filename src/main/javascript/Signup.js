@@ -83,7 +83,7 @@ const Signup = ({}) => {
     try {
       // Make a request to your authentication endpoint
       const response = await axios.post("/registeruser", userData);
-
+      console.log(userData);
       if (response.data === "Username already present") {
         throw new Error(
           "User already registered! Please login or forget password"
@@ -98,7 +98,7 @@ const Signup = ({}) => {
         setPassword("");
       }
     } catch (error) {
-      alert("User already registered! Please login or forget password");
+      alert("Error registering User" + userData);
     }
   }
 
